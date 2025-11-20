@@ -52,6 +52,7 @@ export default async function (fastify) {
         type: "success",
         text: "Item deleted successfully."
       }]);
+      return reply.redirect("/admin/item");
     } catch (err) {
       request.session.set("meassages", [{ type: "danger", text: "Failed to delete the item." }]);
       fastify.log.error("Error deleting item");
