@@ -12,26 +12,51 @@ export default async function (fastify) {
 
   // Route to create or edit an item
   fastify.post("/", async (request, reply) => {
-    const { itemId, sku, name, price } = request.body;
+    const { itemId, sku, name, price, tags } = request.body;
 
-    // Placeholder logic to create or update an item
-    if (itemId) {
-      fastify.log.info(`Updating item ${itemId}:`, { sku, name, price });
-    } else {
-      fastify.log.info(`Creating new item:`, { sku, name, price });
+    const parsedTags = tags ? tags.split(",").map(tag => tag.trim()) : [];
+    
+    try {
+      // Placeholder logic to create or update an item
+      if (itemId) {
+        await fastify.Item.findByIdAndUpdate(itemId, { sku, name, price, tags });
+          fastify.log.info(`Updating item ${itemId}:`, { sku, name, price });
+      } else {
+        await fastify.Item.create({ sku, name, price, tags: parsedTags });
+        fastify.log.info("Creating new item:", { name });
+      }
+
+      request.session.set("meassages", [{
+        type: "success",
+        text: itemId 
+          ? "Item updated successfully."
+          : "Item created successfully."
+      }]);
+
+      return reply.redirect("/admin/item");
+    } catch (e) {
+      request.session.set("meassages", [{ type: "danger", text: "Failed to save the item." }]);
+      fastify.log.error("Error saving item");
+      return reply.redirect("/admin/item");
     }
-
-    return reply.redirect("/admin/item");
+   
   });
 
   // Route to delete an item
   fastify.get("/delete/:id", async (request, reply) => {
     const { id } = request.params;
 
-    // Placeholder logic to delete an item
-    fastify.log.info(`Deleting item with id: ${id}`);
-
-    return reply.redirect("/admin/item");
+    try {
+      await fastify.Item.findByIdAndDelete(id);
+      request.session.set("meassages", [{
+        type: "success",
+        text: "Item deleted successfully."
+      }]);
+    } catch (err) {
+      request.session.set("meassages", [{ type: "danger", text: "Failed to delete the item." }]);
+      fastify.log.error("Error deleting item");
+      return reply.redirect("/admin/item");
+    }
   });
 
   // Route to fetch a single item for editing
