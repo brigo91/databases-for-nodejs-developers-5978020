@@ -28,6 +28,8 @@
     "@fastify/view": "^10.0.2",
     "ejs": "^3.1.10",
     "fastify": "^5.2.1",
-    "mongoose": "^8.20.0"
+    "mongoose": "^8.20.0",
+    "mysql2": "^3.15.3",
+    "sequelize": "^6.37.7"
   }
 }
